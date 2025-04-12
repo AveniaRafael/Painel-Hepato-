@@ -1,4 +1,4 @@
-# Gradle files
+# Gradle files (Android)
 .gradle/
 build/
 
@@ -15,7 +15,7 @@ captures/
 *.apk
 output.json
 
-# IntelliJ
+# IntelliJ/IDEA
 *.iml
 .idea/
 misc.xml
@@ -31,3 +31,37 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js
+.next/
+out/
+
+# Tailwind CSS
+tailwind.config.js
+postcss.config.js
+
+# TypeScript
+*.tsbuildinfo
+
+# Build output
+dist/
+build/
+
+# Test coverage
+coverage/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Editor/IDE specific
+.vscode/
+*.swp
+*.swo
