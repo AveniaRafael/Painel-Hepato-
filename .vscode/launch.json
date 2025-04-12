@@ -1,0 +1,409 @@
+{ "use client"
+}
+
+"compounds": [
+  {
+    "name": "Compound",
+    "configurations": []
+  }
+]," useState } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { Line, LineChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { CalendarIcon, PillIcon, ActivityIcon, FileTextIcon } from "lucide-react"
+},
+
+// Data
+const exames = [
+  {
+    data: "08/01/2025",
+    TGO: 740,
+    TGP: 1092,
+    Bilirrubina: 2.6,
+    GGT: 348,
+    Fosfatase: 128,
+    INR: 1.34,
+    Albumina: null,
+    IgG: null,
+    Ferritina: null,
+  },
+  {
+    data: "07/02/2025",
+    TGO: 553,
+    TGP: 885,
+    Bilirrubina: 2.9,
+    GGT: 320,
+    Fosfatase: 109,
+    INR: 1.15,
+    Albumina: 4.09,
+    IgG: 3283,
+    Ferritina: 1048,
+  },
+  {
+    data: "26/03/2025",
+    TGO: 455,
+    TGP: 296,
+    Bilirrubina: 1.18,
+    GGT: 372,
+    Fosfatase: 106,
+    INR: null,
+    Albumina: null,
+    IgG: null,
+    Ferritina: null,
+  },
+]
+
+const sintomas = [
+  { semana: "14/12/2024", Fadiga: 9, Tremores: 0, Insomnia: 0, DorAbdominal: 10, UrinaEscura: 0 },
+  { semana: "08/01/2025", Fadiga: 9, Tremores: 1, Insomnia: 2, DorAbdominal: 7, UrinaEscura: 7 },
+  { semana: "07/02/2025", Fadiga: 9, Tremores: 2, Insomnia: 0, DorAbdominal: 6, UrinaEscura: 7 },
+  { semana: "07/04/2025", Fadiga: 9, Tremores: 7, Insomnia: 6, DorAbdominal: 6, UrinaEscura: 8 },
+]
+
+const medicamentos = [
+  { data: "14/02/2025", nome: "Azatioprina", dose: "100 mg/dia", categoria: "Imunossupressor" },
+  { data: "14/02/2025", nome: "Prednisolona", dose: "30 mg/dia", categoria: "Corticosteroide" },
+]
+
+const diagnostico =
+  "Hepatite Autoimune com fibrose avançada e inflamação portal intensa. Diagnóstico confirmado por biópsia hepática com necrose confluente e hepatite de interface. Autoanticorpos positivos com padrão vascular, tubular e glomerular. IgG elevada. Exames adicionais: FAN citoplasmático fibrilar linear (AC-15), título 1:160; Anti-músculo liso reagente 1:640; INR alterado (1.34); bilirrubina total de 2.6 com direta 1.8; Fosfatase alcalina aumentada (128); GGT 348; TGO 740; TGP 1092."
+
+// Chart configurations
+const labTestsConfig = {
+  TGO: { label: "TGO (U/L)", color: "hsl(16, 100%, 50%)" },
+  TGP: { label: "TGP (U/L)", color: "hsl(120, 40%, 50%)" },
+  Bilirrubina: { label: "Bilirrubina (mg/dL)", color: "hsl(260, 60%, 60%)" },
+  GGT: { label: "GGT (U/L)", color: "hsl(210, 100%, 50%)" },
+  Fosfatase: { label: "Fosfatase (U/L)", color: "hsl(170, 100%, 40%)" },
+  INR: { label: "INR", color: "hsl(300, 70%, 50%)" },
+  Albumina: { label: "Albumina (g/dL)", color: "hsl(0, 100%, 40%)" },
+  IgG: { label: "IgG (mg/dL)", color: "hsl(330, 100%, 60%)" },
+  Ferritina: { label: "Ferritina (ng/mL)", color: "hsl(180, 70%, 40%)" },
+}
+
+const symptomsConfig = {
+  Fadiga: { label: "Fadiga", color: "hsl(0, 100%, 50%)" },
+  Tremores: { label: "Tremores", color: "hsl(195, 100%, 45%)" },
+  Insomnia: { label: "Insônia", color: "hsl(280, 70%, 45%)" },
+  DorAbdominal: { label: "Dor Abdominal", color: "hsl(30, 100%, 50%)" },
+  UrinaEscura: { label: "Urina Escura", color: "hsl(220, 70%, 50%)" },
+}
+
+export default function PainelHepatite() {
+  // State for lab test selection
+  const [selectedLabTests, setSelectedLabTests] = useState({
+    TGO: true,
+    TGP: true,
+    Bilirrubina: true,
+    GGT: false,
+    Fosfatase: false,
+    INR: false,
+    Albumina: false,
+    IgG: false,
+    Ferritina: false,
+  })
+
+  // State for symptoms selection
+  const [selectedSymptoms, setSelectedSymptoms] = useState({
+    Fadiga: true,
+    Tremores: true,
+    Insomnia: true,
+    DorAbdominal: true,
+    UrinaEscura: true,
+  })
+
+  // Toggle lab test selection
+  const toggleLabTest = (test) => {
+    setSelectedLabTests({
+      ...selectedLabTests,
+      [test]: !selectedLabTests[test],
+    })
+  }
+
+  // Toggle symptom selection
+  const toggleSymptom = (symptom) => {
+    setSelectedSymptoms({
+      ...selectedSymptoms,
+      [symptom]: !selectedSymptoms[symptom],
+    })
+  }
+
+  // Format date for better display
+  const formatDate = (dateStr) => {
+    const [day, month, year] = dateStr.split("/")
+    return `${day}/${month}`
+  }
+
+  return (
+    <div className="w-full max-w-6xl mx-auto p-4">
+      <Card className="mb-6">
+        <CardHeader className="bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900">
+          <CardTitle className="text-2xl flex items-center gap-2">
+            <ActivityIcon className="h-6 w-6 text-amber-600" />
+            Monitoramento de Hepatite Autoimune
+          </CardTitle>
+          <CardDescription>Acompanhamento de exames laboratoriais, sintomas e tratamento</CardDescription>
+        </CardHeader>
+      </Card>
+
+      <Tabs defaultValue="exames" className="w-full">
+        <TabsList className="grid grid-cols-3 mb-4">
+          <TabsTrigger value="exames" className="flex items-center gap-2">
+            <FileTextIcon className="h-4 w-4" />
+            <span className="hidden sm:inline">Exames</span>
+          </TabsTrigger>
+          <TabsTrigger value="sintomas" className="flex items-center gap-2">
+            <ActivityIcon className="h-4 w-4" />
+            <span className="hidden sm:inline">Sintomas</span>
+          </TabsTrigger>
+          <TabsTrigger value="medicamentos" className="flex items-center gap-2">
+            <PillIcon className="h-4 w-4" />
+            <span className="hidden sm:inline">Tratamento</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="exames">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">Exames Laboratoriais</CardTitle>
+              <CardDescription>Evolução dos marcadores hepáticos ao longo do tempo</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {Object.keys(labTestsConfig).map((test) => (
+                  <div key={test} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`lab-${test}`}
+                      checked={selectedLabTests[test]}
+                      onCheckedChange={() => toggleLabTest(test)}
+                      style={{
+                        borderColor: labTestsConfig[test].color,
+                        backgroundColor: selectedLabTests[test] ? labTestsConfig[test].color : "transparent",
+                      }}
+                    />
+                    <Label htmlFor={`lab-${test}`} className="text-sm">
+                      {labTestsConfig[test].label}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6">
+                <ChartContainer
+                  config={Object.fromEntries(
+                    Object.entries(labTestsConfig)
+                      .filter(([key]) => selectedLabTests[key])
+                      .map(([key, value]) => [key, value]),
+                  )}
+                  className="h-[350px]"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={exames} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                      <XAxis dataKey="data" tickFormatter={formatDate} tickLine={false} axisLine={false} />
+                      <YAxis tickLine={false} axisLine={false} width={40} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      {Object.keys(labTestsConfig)
+                        .filter((key) => selectedLabTests[key])
+                        .map((key) => (
+                          <Line
+                            key={key}
+                            type="monotone"
+                            dataKey={key}
+                            stroke={labTestsConfig[key].color}
+                            strokeWidth={2}
+                            dot={{ r: 4 }}
+                            activeDot={{ r: 6 }}
+                            connectNulls
+                          />
+                        ))}
+                    </LineChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </div>
+
+              <div className="mt-6 overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2">Data</th>
+                      {Object.keys(labTestsConfig)
+                        .filter((key) => selectedLabTests[key])
+                        .map((key) => (
+                          <th key={key} className="text-left py-2">
+                            {labTestsConfig[key].label}
+                          </th>
+                        ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {exames.map((exame, index) => (
+                      <tr key={index} className="border-b">
+                        <td className="py-2">{exame.data}</td>
+                        {Object.keys(labTestsConfig)
+                          .filter((key) => selectedLabTests[key])
+                          .map((key) => (
+                            <td key={key} className="py-2">
+                              {exame[key] !== null ? exame[key] : "-"}
+                            </td>
+                          ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="sintomas">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">Sintomas Semanais</CardTitle>
+              <CardDescription>Intensidade dos sintomas em escala de 0-10</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {Object.keys(symptomsConfig).map((symptom) => (
+                  <div key={symptom} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`symptom-${symptom}`}
+                      checked={selectedSymptoms[symptom]}
+                      onCheckedChange={() => toggleSymptom(symptom)}
+                      style={{
+                        borderColor: symptomsConfig[symptom].color,
+                        backgroundColor: selectedSymptoms[symptom] ? symptomsConfig[symptom].color : "transparent",
+                      }}
+                    />
+                    <Label htmlFor={`symptom-${symptom}`} className="text-sm">
+                      {symptomsConfig[symptom].label}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6">
+                <ChartContainer
+                  config={Object.fromEntries(
+                    Object.entries(symptomsConfig)
+                      .filter(([key]) => selectedSymptoms[key])
+                      .map(([key, value]) => [key, value]),
+                  )}
+                  className="h-[350px]"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={sintomas} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                      <XAxis dataKey="semana" tickFormatter={formatDate} tickLine={false} axisLine={false} />
+                      <YAxis domain={[0, 10]} tickLine={false} axisLine={false} width={30} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      {Object.keys(symptomsConfig)
+                        .filter((key) => selectedSymptoms[key])
+                        .map((key) => (
+                          <Line
+                            key={key}
+                            type="monotone"
+                            dataKey={key}
+                            stroke={symptomsConfig[key].color}
+                            strokeWidth={2}
+                            dot={{ r: 4 }}
+                            activeDot={{ r: 6 }}
+                          />
+                        ))}
+                    </LineChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </div>
+
+              <div className="mt-6 overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2">Semana</th>
+                      {Object.keys(symptomsConfig)
+                        .filter((key) => selectedSymptoms[key])
+                        .map((key) => (
+                          <th key={key} className="text-left py-2">
+                            {symptomsConfig[key].label}
+                          </th>
+                        ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sintomas.map((sintoma, index) => (
+                      <tr key={index} className="border-b">
+                        <td className="py-2">{sintoma.semana}</td>
+                        {Object.keys(symptomsConfig)
+                          .filter((key) => selectedSymptoms[key])
+                          .map((key) => (
+                            <td key={key} className="py-2">
+                              {sintoma[key]}
+                            </td>
+                          ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="medicamentos">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <FileTextIcon className="h-5 w-5 text-amber-600" />
+                  Diagnóstico
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="p-4 bg-amber-50 dark:bg-amber-950/50 rounded-lg border border-amber-200 dark:border-amber-800">
+                  <p className="text-sm leading-relaxed">{diagnostico}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <PillIcon className="h-5 w-5 text-amber-600" />
+                  Medicações em uso
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {medicamentos.map((med, index) => (
+                    <div key={index} className="flex flex-col p-4 border rounded-lg">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold text-lg">{med.nome}</h3>
+                          <p className="text-sm text-muted-foreground">{med.dose}</p>
+                        </div>
+                        <Badge
+                          variant="outline"
+                          className="bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300"
+                        >
+                          {med.categoria}
+                        </Badge>
+                      </div>
+                      <div className="mt-2 flex items-center text-xs text-muted-foreground">
+                        <CalendarIcon className="h-3 w-3 mr-1" />
+                        <span>Início: {med.data}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
+}
